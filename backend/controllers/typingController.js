@@ -1,16 +1,28 @@
 import TypingResult from "../models/TypingResult.js";
+import getLocationFromIP from "../utils/getLocationFromIP.js";
 
 const saveTypingResult = async (req, res) => {
-    const { wpm, accuracy, userId } = req.body;
+    const { input, wpm, accuracy, time } = req.body;
 
-    if (wpm === undefined || accuracy === undefined) {
-        return res.status(400).json({ success: false, message: "WPM and accuracy are required" });
+    if (wpm === undefined || accuracy === undefined || time === undefined) {
+        return res.status(400).json({ success: false, message: "WPM, accuracy, and time are required" });
     }
 
     try {
-        const result = new TypingResult({ wpm, accuracy, userId });
-        await result.save();
-        return res.status(201).json({ success: true, result });
+        const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+        let locationString = "Unknown";
+        try {
+            const locationData = await getLocationFromIP(ip);
+            if (locationData) locationString = `${locationData.city}, ${locationData.country}`;
+        } catch (locErr) { }
+
+        const resultRecord = new TypingResult({
+            location: locationString,
+            input: input || "",
+            result: { wpm, accuracy, time }
+        });
+        await resultRecord.save();
+        return res.status(201).json({ success: true, result: resultRecord });
     } catch (error) {
         console.error("Error saving typing result:", error);
         return res.status(500).json({ success: false, message: "Server Error" });

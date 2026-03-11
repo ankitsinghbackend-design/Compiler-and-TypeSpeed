@@ -1,10 +1,17 @@
 import mongoose from "mongoose";
 
-const typingResultSchema = new mongoose.Schema({
-    userId: { type: String },
-    wpm: { type: Number, required: true },
-    accuracy: { type: Number, required: true },
-    createdAt: { type: Date, default: Date.now },
-});
+const typingResultSchema = new mongoose.Schema(
+    {
+        location: String,
+        input: String,
+        result: {
+            wpm: Number,
+            accuracy: Number,
+            time: Number,
+        },
+        createdAt: { type: Date, default: Date.now },
+    },
+    { timestamps: true }
+);
 
 export default mongoose.model("TypingResult", typingResultSchema);

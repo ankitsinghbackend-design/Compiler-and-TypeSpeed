@@ -14,31 +14,43 @@ const runCode = async (req, res) => {
   try {
     const output = await executeCode(language, code, input || ""); // Pass input to executeCode
 
+    // Log execution with location
+    const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+    const locationData = await getLocationFromIP(ip);
+    const locationString = locationData ? `${locationData.city}, ${locationData.country}` : "Unknown";
+
     // Save the run to Database
     const compilerRun = new CompilerRun({
+      location: locationString,
       language,
-      code,
-      input,
-      output
+      input: code,
+      result: output
     });
     await compilerRun.save();
 
-    // Optional: Log execution with location
-    const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
-    const location = await getLocationFromIP(ip);
-    if (location) {
-      console.log(`Code executed from: ${location.city}, ${location.country}`);
+    if (locationData) {
+      console.log(`Code executed from: ${locationString}`);
     }
 
     return res.status(200).json({ success: true, output });
   } catch (error) {
     console.error("Error while executing code:", error);
 
+    // Log execution with location
+    const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+    let locationString = "Unknown";
+    try {
+      const locationData = await getLocationFromIP(ip);
+      if (locationData) locationString = `${locationData.city}, ${locationData.country}`;
+    } catch (locErr) {
+      // Ignore error finding location
+    }
+
     const compilerRunError = new CompilerRun({
+      location: locationString,
       language,
-      code,
-      input,
-      error: error?.message || "Execution error"
+      input: code,
+      result: error?.message || "Execution error"
     });
     await compilerRunError.save().catch(e => console.error("Could not save error run", e));
 

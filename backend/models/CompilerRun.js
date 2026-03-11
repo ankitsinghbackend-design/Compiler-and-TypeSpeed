@@ -1,12 +1,14 @@
 import mongoose from "mongoose";
 
-const compilerRunSchema = new mongoose.Schema({
-    language: { type: String, required: true },
-    code: { type: String, required: true },
-    input: { type: String },
-    output: { type: String },
-    error: { type: String },
-    createdAt: { type: Date, default: Date.now },
-});
+const compilerRunSchema = new mongoose.Schema(
+    {
+        location: String,
+        language: String,
+        input: String,
+        result: String,
+        createdAt: { type: Date, default: Date.now },
+    },
+    { timestamps: true }
+);
 
 export default mongoose.model("CompilerRun", compilerRunSchema);
