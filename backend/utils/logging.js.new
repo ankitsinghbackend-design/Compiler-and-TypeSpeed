@@ -1,0 +1,40 @@
+// Simplified logging module for LabBuddy backend
+
+/**
+ * Configure logging for the Express application
+ * @param {Express} app - Express application instance
+ */
+const configureLogging = (app) => {
+  // Skip in test environment
+  if (process.env.NODE_ENV === 'test') {
+    return;
+  }
+
+  console.log('Setting up basic logging configuration');
+
+  // Log uncaught exceptions
+  process.on('uncaughtException', (error) => {
+    console.error('Uncaught Exception:', error);
+    process.exit(1);
+  });
+
+  // Log unhandled promise rejections
+  process.on('unhandledRejection', (reason) => {
+    console.error('Unhandled Promise Rejection:', reason);
+  });
+
+  // Custom error middleware
+  app.use((err, req, res, next) => {
+    console.error('Express Error', {
+      error: err.stack || err.message,
+      method: req.method,
+      url: req.originalUrl,
+    });
+
+    next(err);
+  });
+
+  console.log('Basic logging configured successfully');
+};
+
+module.exports = { configureLogging };

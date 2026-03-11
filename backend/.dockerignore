@@ -1,0 +1,34 @@
+# Node modules and dependencies
+node_modules
+npm-debug.log
+
+# Git and GitHub files
+.git
+.github
+.gitignore
+
+# Environment variables and configuration
+.env
+.env.*
+*.env
+
+# Test and coverage files
+coverage
+*.test.js
+__tests__
+__mocks__
+
+# Docker files
+Dockerfile
+.dockerignore
+
+# Misc files
+README.md
+LICENSE
+*.md
+.vscode
+.idea
+*.log
+logs
+tmp
+temp

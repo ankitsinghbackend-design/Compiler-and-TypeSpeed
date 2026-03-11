@@ -1,0 +1,298 @@
+{
+  "info": {
+    "name": "LabBuddy API",
+    "description": "Collection for testing LabBuddy backend APIs",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Register User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Test User\",\n  \"email\": \"test@example.com\",\n  \"password\": \"Password123\",\n  \"confirmPassword\": \"Password123\",\n  \"semester\": 5,\n  \"branch\": \"computer science\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/signup",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "signup"]
+            },
+            "description": "Register a new user"
+          }
+        },
+        {
+          "name": "Login User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"test@example.com\",\n  \"password\": \"Password123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "login"]
+            },
+            "description": "Login an existing user"
+          }
+        },
+        {
+          "name": "Logout User",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/logout",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "logout"]
+            },
+            "description": "Logout the current user"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Snippets",
+      "item": [
+        {
+          "name": "Create Snippet",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Test Snippet\",\n  \"code\": \"console.log('Hello, World!');\",\n  \"language\": \"javascript\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/snippets/create",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "snippets", "create"]
+            },
+            "description": "Create a new code snippet"
+          }
+        },
+        {
+          "name": "Get All Snippets",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/snippets",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "snippets"]
+            },
+            "description": "Get all snippets for the current user"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Notebooks",
+      "item": [
+        {
+          "name": "Create Notebook",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Test Notebook\",\n  \"description\": \"This is a test notebook\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/notebooks/create",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "notebooks", "create"]
+            },
+            "description": "Create a new notebook"
+          }
+        },
+        {
+          "name": "Get All Notebooks",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/notebooks",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "notebooks"]
+            },
+            "description": "Get all notebooks for the current user"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Code Runner",
+      "item": [
+        {
+          "name": "Run Code",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"language\": \"python\",\n  \"code\": \"print('Hello, World!')\",\n  \"input\": \"\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/code/run",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "code", "run"]
+            },
+            "description": "Run code and get output"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Gemini AI",
+      "item": [
+        {
+          "name": "Get Code Suggestions",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"code\": \"function sum(a, b) {\\n  return a + b;\\n}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/gemini/suggestions",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "gemini", "suggestions"]
+            },
+            "description": "Get code improvement suggestions"
+          }
+        },
+        {
+          "name": "Get Code Complexity",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"code\": \"function factorial(n) {\\n  if (n <= 1) return 1;\\n  return n * factorial(n-1);\\n}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/gemini/complexity",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "gemini", "complexity"]
+            },
+            "description": "Analyze code complexity"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/health",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "health"]
+        },
+        "description": "Check server health status"
+      }
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [""]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [""]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5001",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}

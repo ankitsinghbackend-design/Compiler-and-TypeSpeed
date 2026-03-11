@@ -1,0 +1,32 @@
+
+> start
+> node server.js
+
+Current directory: /Users/ashutoshkumar/MyWork/PROJECTS/labBuddy/labbuddy-backend/utils
+Env file path: /Users/ashutoshkumar/MyWork/PROJECTS/labBuddy/labbuddy-backend/.env
+Current directory: /Users/ashutoshkumar/MyWork/PROJECTS/labBuddy/labbuddy-backend/utils
+Env file path: /Users/ashutoshkumar/MyWork/PROJECTS/labBuddy/labbuddy-backend/.env
+Current directory: /Users/ashutoshkumar/MyWork/PROJECTS/labBuddy/labbuddy-backend/utils
+Env file path: /Users/ashutoshkumar/MyWork/PROJECTS/labBuddy/labbuddy-backend/.env
+Initializing temp directory cleanup...
+[2025-06-03T17:31:20.173Z] Temp directory cleanup completed. Deleted 0 files.
+Scheduler initialized. Cleanup will run every 30 minutes.
+Setting up basic logging configuration
+Basic logging configured successfully
+(node:95024) [MONGODB DRIVER] Warning: useNewUrlParser is a deprecated option: useNewUrlParser has no effect since Node.js Driver version 4.0.0 and will be removed in the next major version
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:95024) [MONGODB DRIVER] Warning: useUnifiedTopology is a deprecated option: useUnifiedTopology has no effect since Node.js Driver version 4.0.0 and will be removed in the next major version
+Uncaught Exception: Error: listen EADDRINUSE: address already in use :::5001
+    at Server.setupListenHandle [as _listen2] (node:net:1937:16)
+    at listenInCluster (node:net:1994:12)
+    at Server.listen (node:net:2099:7)
+    at file:///Users/ashutoshkumar/MyWork/PROJECTS/labBuddy/labbuddy-backend/server.js:206:8
+    at ModuleJob.run (node:internal/modules/esm/module_job:271:25)
+    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:578:26)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:116:5) {
+  code: 'EADDRINUSE',
+  errno: -48,
+  syscall: 'listen',
+  address: '::',
+  port: 5001
+}
