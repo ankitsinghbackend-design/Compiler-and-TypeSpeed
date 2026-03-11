@@ -13,13 +13,13 @@ const getLocationFromIP = async (req) => {
         let ip = rawIp.split(',')[0].trim();
 
         if (ip === "::1" || ip === "127.0.0.1") {
-            // In local dev, we might not get a valid public IP. We fallback to returning Unknown Location, 
-            // or we can test with a default public IP if we wish, but matching specs exactly:
-            return "Unknown Location";
+            // For local development, make a request without an IP to get the server's public IP's location
+            ip = "";
         }
 
         // 2. Use a free geolocation API
-        const response = await axios.get(`http://ip-api.com/json/${ip}`);
+        const url = ip ? `http://ip-api.com/json/${ip}` : `http://ip-api.com/json/`;
+        const response = await axios.get(url);
 
         if (response.data && response.data.status === "success") {
             // 3. Return the specified object

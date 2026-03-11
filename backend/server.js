@@ -24,7 +24,7 @@ app.use(
 );
 
 // Routes
-app.use("/api/code", compilerRoutes);
+app.use("/api/compiler", compilerRoutes);
 app.use("/api/typing", typingRoutes);
 
 // Root endpoint
@@ -35,7 +35,7 @@ app.get("/", (req, res) => {
     status: "running",
     endpoints: {
       health: "/health",
-      code: "/api/code",
+      compiler: "/api/compiler",
       typing: "/api/typing",
     },
   });

@@ -19,7 +19,7 @@ const runCode = async (req, res) => {
     let locationString = "Unknown Location";
 
     if (typeof locationData === 'object' && locationData !== null) {
-      locationString = `${locationData.city}, ${locationData.region}, ${locationData.country}`;
+      locationString = `${locationData.city}, ${locationData.country}`;
     } else if (typeof locationData === 'string') {
       locationString = locationData;
     }
@@ -44,7 +44,7 @@ const runCode = async (req, res) => {
     try {
       const locationData = await getLocationFromIP(req);
       if (typeof locationData === 'object' && locationData !== null) {
-        locationString = `${locationData.city}, ${locationData.region}, ${locationData.country}`;
+        locationString = `${locationData.city}, ${locationData.country}`;
       } else if (typeof locationData === 'string') {
         locationString = locationData;
       }
