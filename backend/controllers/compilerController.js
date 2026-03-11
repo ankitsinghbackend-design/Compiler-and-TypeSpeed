@@ -15,9 +15,14 @@ const runCode = async (req, res) => {
     const output = await executeCode(language, code, input || ""); // Pass input to executeCode
 
     // Log execution with location
-    const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
-    const locationData = await getLocationFromIP(ip);
-    const locationString = locationData ? `${locationData.city}, ${locationData.country}` : "Unknown";
+    const locationData = await getLocationFromIP(req);
+    let locationString = "Unknown Location";
+
+    if (typeof locationData === 'object' && locationData !== null) {
+      locationString = `${locationData.city}, ${locationData.region}, ${locationData.country}`;
+    } else if (typeof locationData === 'string') {
+      locationString = locationData;
+    }
 
     // Save the run to Database
     const compilerRun = new CompilerRun({
@@ -28,20 +33,21 @@ const runCode = async (req, res) => {
     });
     await compilerRun.save();
 
-    if (locationData) {
-      console.log(`Code executed from: ${locationString}`);
-    }
+    console.log(`Code executed from: ${locationString}`);
 
     return res.status(200).json({ success: true, output });
   } catch (error) {
     console.error("Error while executing code:", error);
 
     // Log execution with location
-    const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
-    let locationString = "Unknown";
+    let locationString = "Unknown Location";
     try {
-      const locationData = await getLocationFromIP(ip);
-      if (locationData) locationString = `${locationData.city}, ${locationData.country}`;
+      const locationData = await getLocationFromIP(req);
+      if (typeof locationData === 'object' && locationData !== null) {
+        locationString = `${locationData.city}, ${locationData.region}, ${locationData.country}`;
+      } else if (typeof locationData === 'string') {
+        locationString = locationData;
+      }
     } catch (locErr) {
       // Ignore error finding location
     }

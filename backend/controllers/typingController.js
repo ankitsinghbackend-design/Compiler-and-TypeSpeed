@@ -9,11 +9,14 @@ const saveTypingResult = async (req, res) => {
     }
 
     try {
-        const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
-        let locationString = "Unknown";
+        let locationString = "Unknown Location";
         try {
-            const locationData = await getLocationFromIP(ip);
-            if (locationData) locationString = `${locationData.city}, ${locationData.country}`;
+            const locationData = await getLocationFromIP(req);
+            if (typeof locationData === 'object' && locationData !== null) {
+                locationString = `${locationData.city}, ${locationData.region}, ${locationData.country}`;
+            } else if (typeof locationData === 'string') {
+                locationString = locationData;
+            }
         } catch (locErr) { }
 
         const resultRecord = new TypingResult({
