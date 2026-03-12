@@ -18,8 +18,12 @@ const server = http.createServer(app);
 app.use(express.json());
 app.use(
   cors({
-    origin: "*",
-    credentials: true,
+    origin: [
+      /\.vercel\.app$/,          // covers all Vercel preview + production URLs
+      "http://localhost:5173",
+      "http://localhost:5174",
+    ],
+    credentials: false,
   }),
 );
 
