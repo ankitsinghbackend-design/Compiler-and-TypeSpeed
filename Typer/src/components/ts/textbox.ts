@@ -300,8 +300,8 @@ export const endRun = () => {
 
 	const finalStats = get(runState)
 	const payload = {
-		wpm:      finalStats.trueWPM  > 0 ? finalStats.trueWPM  : finalStats.aggWPM,
-		spm:      finalStats.trueSPM  > 0 ? finalStats.trueSPM  : finalStats.aggSPM,
+		wpm:      finalStats.aggWPM,
+		spm:      finalStats.aggSPM,
 		accuracy: finalStats.accuracy,
 		time:     finalStats.timePassed
 	}
