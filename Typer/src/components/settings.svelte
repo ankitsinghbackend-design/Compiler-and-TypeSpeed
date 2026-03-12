@@ -1,75 +1,29 @@
 <script lang="ts">
 	import { fly } from "svelte/transition";
-	import { fixBwithA, refreshCosmetics, settings, template } from "../store";
+	import { refreshCosmetics, settings, template } from "../store";
 	import Input from "./ui/input.svelte";
 	import Select from "./ui/select.svelte";
 	import Checkbox from "./ui/checkbox.svelte";
 	import Button from "./ui/button.svelte";
-	import { getFromLocalStorage, saveToLocalStorage } from "../lib/util";
 	import {
 		getFonts,
 		loadTextFileList,
 		randomizeSettings,
-		saveCosmetics,
 		type Wordlists,
 	} from "./ts/settings";
-	import { sendNotification } from "./ts/notifications";
 	import Tooltip from "./ui/tooltip.svelte";
 	import { resetRun } from "./ts/textbox";
 	import { renewCache } from "../lib/cache";
 
 	let fonts: string[];
-	let newName: string;
 	(async () => {
 		fonts = await getFonts();
 	})();
-
-	let savedCosmetics: any = {};
-	const getSavedCosmetics = () => {
-		let c = getFromLocalStorage("savedCosmetics");
-		if (c === null) c = {};
-
-		savedCosmetics = c;
-	};
-
-	const changeCosmetics = (name: string) => {
-		const c = getFromLocalStorage("savedCosmetics")[name];
-		settings.update((s) => {
-			s.cosmetics = c;
-			return s;
-		});
-		refreshCosmetics();
-	};
-
-	const deleteSetting = (name: string) => {
-		let s = getFromLocalStorage("savedCosmetics");
-		delete s[name];
-		saveToLocalStorage("savedCosmetics", s);
-		getSavedCosmetics();
-	};
-
-	const exportCosmetics = (name: string) => {
-		const data = JSON.stringify(getFromLocalStorage("savedCosmetics")[name]);
-		navigator.clipboard.writeText(data);
-		sendNotification({
-			content: "Copied to Clipboard!",
-			type: "info",
-		});
-	};
-
-	let imported = "";
-	const importCosmetics = () => {
-		const data = JSON.parse(imported);
-		$settings.cosmetics = fixBwithA($settings.cosmetics, data);
-		refreshCosmetics();
-	};
 
 	const resetToDefault = () => {
 		$settings = template;
 		refreshCosmetics();
 	};
-
-	getSavedCosmetics();
 
 	let fontsFocus = false;
 	let wordlists: Wordlists = [];
@@ -77,6 +31,15 @@
 	(async () => {
 		wordlists = await loadTextFileList();
 	})();
+
+	// Debounce for Sec input so timer refreshes as user types, without spamming resets
+	let timeDebounce: ReturnType<typeof setTimeout>;
+	const applyTimeChange = () => {
+		clearTimeout(timeDebounce);
+		timeDebounce = setTimeout(() => {
+			resetRun();
+		}, 600);
+	};
 </script>
 
 {#if $settings.opened}
@@ -89,13 +52,6 @@
 			<div class="grid grid-cols-4 auto-rows-auto gap-3 p-3">
 				<h1 class="font-bold text-xl flex items-center gap-6">
 					Settings
-					<a
-						class="text-xs text-current"
-						href="https://github.com/0ql/Coffeetyper-Svelte"
-						target="_blank"
-					>
-						Github
-					</a>
 				</h1>
 
 				<h2 class="text-base font-normal m-0 col-span-4">Font Family</h2>
@@ -121,8 +77,7 @@
 
 				<div class="col-span-2">
 					<div>Mode</div>
-					<Select class="mt-3 w-full" bind:value={$settings.modeName}>
-						<option value="timed">Timed</option>
+					<Select class="mt-3 w-full" bind:value={$settings.modeName} on:change={resetRun}>
 						<option value="countdown">Countdown</option>
 						<option value="countup">Countup</option>
 					</Select>
@@ -132,11 +87,12 @@
 					<Input
 						class="mt-3 text-center w-full"
 						bind:value={$settings.mode.time}
+						on:input={applyTimeChange}
 					/>
 				</div>
 				<div>
 					<div>Words</div>
-					<Input class="mt-3 text-center w-full" bind:value={$settings.words} />
+					<Input class="mt-3 text-center w-full" bind:value={$settings.words} on:change={resetRun} />
 				</div>
 
 				<h2 class="text-base m-0 mt-3 font-normal col-span-4">Textbox</h2>
@@ -159,6 +115,7 @@
 					<Input
 						class="mt-2 text-center w-full"
 						bind:value={$settings.cosmetics.textBox.width}
+						on:change={resetRun}
 					/>
 				</div>
 				<div>
@@ -166,6 +123,7 @@
 					<Input
 						class="mt-2 text-center w-full"
 						bind:value={$settings.cosmetics.textBox.lines}
+						on:change={resetRun}
 					/>
 				</div>
 				<div>
@@ -173,6 +131,7 @@
 					<Input
 						class="mt-2 text-center w-full"
 						bind:value={$settings.cosmetics.textBox.lineHeight}
+						on:change={resetRun}
 					/>
 				</div>
 				<div>
@@ -180,6 +139,7 @@
 					<Input
 						class="mt-2 text-center w-full"
 						bind:value={$settings.cosmetics.textBox.letterSpacing}
+						on:change={resetRun}
 					/>
 				</div>
 
@@ -188,6 +148,7 @@
 					<Input
 						class="mt-2 text-center w-full"
 						bind:value={$settings.cosmetics.textBox.fontSize}
+						on:change={resetRun}
 					/>
 				</div>
 				<div>
@@ -195,6 +156,7 @@
 					<Input
 						class="mt-2 text-center w-full"
 						bind:value={$settings.cosmetics.textBox.spaceWidth}
+						on:change={resetRun}
 					/>
 				</div>
 				<div class="col-span-1" />
@@ -205,7 +167,7 @@
 
 				<div class="col-span-2">
 					<div class="text-xs">Choose text source</div>
-					<Select class="w-full mt-2" bind:value={$settings.gen.set}>
+					<Select class="w-full mt-2" bind:value={$settings.gen.set} on:change={resetRun}>
 						<option value="preset">Preset</option>
 						<option value="api">Api</option>
 						<option value="custom">Custom</option>
@@ -215,7 +177,7 @@
 				{#if $settings.gen.set === "preset" || $settings.gen.set === "api"}
 					<div class="col-span-2">
 						<div class="text-xs">Presets</div>
-						<Select class="w-full mt-2" bind:value={$settings.gen.preSet}>
+						<Select class="w-full mt-2" bind:value={$settings.gen.preSet} on:change={resetRun}>
 							{#if $settings.gen.set === "api"}
 								<option value="wikipedia">Wikipedia</option>
 							{:else}
@@ -242,6 +204,7 @@
 				<Select
 					class="col-span-4 w-full"
 					bind:value={$settings.gen.filters.casing}
+					on:change={resetRun}
 				>
 					<option value="default">Default</option>
 					<option value="lowercase">Lowercase</option>
@@ -318,79 +281,6 @@
 				<Button class="col-span-2" on:click={resetToDefault}
 					>Reset to Default</Button
 				>
-
-				<h3 class="col-span-2 text-base font-normal m-0 mt-3">
-					Background Image
-				</h3>
-
-				<div class="col-span-3">
-					<div class="text-xs">Url</div>
-					<Input
-						class="mt-2 w-full"
-						placeholder="Paste url here"
-						bind:value={$settings.cosmetics.background.bgImg}
-					/>
-				</div>
-				<div class="col-span-1">
-					<div class="text-xs">Opacity</div>
-					<Input
-						class="mt-2 text-center w-full"
-						bind:value={$settings.cosmetics.background.opacity}
-					/>
-				</div>
-
-				<h3 class="col-span-full text-base font-normal m-0 mt-3">
-					Save Cosmetics
-				</h3>
-
-				<div class="text-xs col-span-4">Name</div>
-				<Input
-					class="col-span-3 w-full"
-					placeholder={$settings.cosmetics.theme.name}
-					bind:value={newName}
-				/>
-				<Button
-					on:click={() => {
-						saveCosmetics(newName);
-						getSavedCosmetics();
-					}}>Save</Button
-				>
-
-				<h3 class="col-span-full text-base font-normal m-0 mt-3">
-					Import Cosmetics
-				</h3>
-
-				<div class="text-xs col-span-4">Paste</div>
-				<Input
-					placeholder="Paste settings here"
-					class="col-span-3 w-full"
-					bind:value={imported}
-				/>
-				<Button on:click={importCosmetics}>Load</Button>
-
-				<h3 class="col-span-full text-base font-normal m-0 mt-3">
-					Saved Cosmetics
-				</h3>
-
-				{#each Object.keys(savedCosmetics) as name}
-					<div class="col-span-4 text-sm">{name}</div>
-					<Button on:click={() => changeCosmetics(name)}>Load</Button>
-					<Button class="col-span-2" on:click={() => exportCosmetics(name)}
-						>Copy to clipboard</Button
-					>
-					<Button on:click={() => deleteSetting(name)}>Delete</Button>
-				{/each}
-				{#if Object.keys(savedCosmetics).length === 0}
-					<div class="text-sm col-span-4">
-						Looks to be empty here... Try saving your favorite configuration and
-						share it with your friends!
-					</div>
-				{/if}
-
-				<!-- <Tooltip
-				hoverText="To bind the Escape button type 'Escape'. Same with 'Alt', 'Tab' and 'Control'. You can also map the same key to the leader and for example 'Reset Run' to double press the key to reset."
-				</Tooltip>
-			> -->
 
 				<h3 class="col-span-full text-base font-normal m-0 mt-3">Keybindings</h3>
 

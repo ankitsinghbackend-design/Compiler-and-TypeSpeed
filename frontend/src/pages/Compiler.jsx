@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Editor from '@monaco-editor/react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
-import { ChevronDown, Code2 } from 'lucide-react';
+import { ChevronDown, Code2, ArrowLeft } from 'lucide-react';
 
 const languageOptions = [
     { value: 'javascript', label: 'JavaScript', icon: <i className="devicon-javascript-plain text-yellow-400"></i> },
@@ -36,7 +37,17 @@ const defaultCode = {
     haskell: 'main :: IO ()\nmain = putStrLn "Hello, World!"'
 };
 
+
+// Reusable ad placeholder
+const AdPlaceholder = ({ height = 'h-20', label = 'Advertisement' }) => (
+    <div className={`w-full ${height} flex flex-col items-center justify-center bg-gray-800/50 border border-dashed border-gray-600 rounded-lg`}>
+        <span className="text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-0.5">AD</span>
+        <span className="text-[9px] text-gray-600 tracking-wide">{label}</span>
+    </div>
+);
+
 const Compiler = () => {
+    const navigate = useNavigate();
     const [language, setLanguage] = useState('javascript');
     const [code, setCode] = useState(defaultCode['javascript']);
     const [input, setInput] = useState('');
@@ -68,7 +79,7 @@ const Compiler = () => {
         const toastId = toast.loading('Compiling and executing...');
 
         try {
-            const response = await axios.post('http://localhost:5001/api/compiler/run', {
+            const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/compiler/run`, {
                 language,
                 code,
                 input
@@ -119,6 +130,13 @@ const Compiler = () => {
                   }
                 `}</style>
                 <div className="flex items-center justify-between mb-4">
+                    <button 
+                        onClick={() => navigate('/')}
+                        className="flex items-center space-x-2 text-gray-400 hover:text-white transition-colors px-2 py-1 mr-4"
+                    >
+                        <ArrowLeft size={20} />
+                        <span className="text-sm font-semibold tracking-wide">BACK</span>
+                    </button>
                     <div className="flex items-center space-x-2">
                         <Code2 className="text-blue-500" />
                         <h1 className="text-xl font-bold text-white hidden sm:block">Code Editor</h1>
@@ -187,6 +205,10 @@ const Compiler = () => {
                         }}
                     />
                 </div>
+                {/* Ad strip below the editor */}
+                <div className="mt-3">
+                    <AdPlaceholder height="h-12" label="728×90 Leaderboard" />
+                </div>
             </div>
 
             {/* Input / Output Section */}
@@ -209,9 +231,15 @@ const Compiler = () => {
                         {output ? output : <span className="text-gray-600 select-none">Output will appear here...</span>}
                     </div>
                 </div>
+
+                {/* Ad below output panel */}
+                <div className="mt-3">
+                    <AdPlaceholder height="h-20" label="300×250 Rectangle" />
+                </div>
             </div>
         </div>
     );
 };
 
 export default Compiler;
+

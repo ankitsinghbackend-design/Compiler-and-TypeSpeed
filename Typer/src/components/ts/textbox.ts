@@ -271,23 +271,50 @@ export const startRun = async () => {
 
 // show statistics
 export const endRun = () => {
+	// Flush latest keystrokes into runState before computing final numbers.
+	// The timer skips updateRunStateStats() on the final tick, so we do it here.
+	updateRunStateStats()
+
+	// Snapshot timePassed from store NOW — resetTimer() will zero the local `passed` var
+	const timePassed = get(runState).timePassed
+
 	runState.update((rs: RunState) => {
-		rs.aggSPM = Math.round(rs.correctLetterCount / (rs.timePassed / 60))
+		const elapsed = timePassed > 0 ? timePassed : rs.timePassed
+
+		rs.aggSPM = Math.round(rs.correctLetterCount / (elapsed / 60))
 		rs.aggWPM = Math.round(rs.aggSPM / 5)
 		rs.aggWPM = isNaN(rs.aggWPM) || !isFinite(rs.aggWPM) ? 0 : rs.aggWPM
 		rs.aggSPM = isNaN(rs.aggSPM) || !isFinite(rs.aggSPM) ? 0 : rs.aggSPM
 
-		rs.trueWPM = Math.round(rs.correctWordCount / (rs.timePassed / 60))
-		rs.trueSPM = Math.round(rs.correctLetterCount / (rs.timePassed / 60))
+		rs.trueWPM = Math.round(rs.correctWordCount / (elapsed / 60))
+		rs.trueSPM = Math.round(rs.correctLetterCount / (elapsed / 60))
 		rs.trueWPM = isNaN(rs.trueWPM) || !isFinite(rs.trueWPM) ? 0 : rs.trueWPM
 		rs.trueSPM = isNaN(rs.trueSPM) || !isFinite(rs.trueSPM) ? 0 : rs.trueSPM
 
+		rs.timePassed = elapsed
 		rs.ended = true
 
 		return rs
 	})
 	resetTimer()
-	console.log(get(runState))
+
+	const finalStats = get(runState)
+	const payload = {
+		wpm:      finalStats.trueWPM  > 0 ? finalStats.trueWPM  : finalStats.aggWPM,
+		spm:      finalStats.trueSPM  > 0 ? finalStats.trueSPM  : finalStats.aggSPM,
+		accuracy: finalStats.accuracy,
+		time:     finalStats.timePassed
+	}
+	console.log('TypeSpeed run ended — saving to DB:', payload)
+
+	fetch(`${import.meta.env.VITE_API_URL}/api/typing/log`, {
+		method: 'POST',
+		headers: { 'Content-Type': 'application/json' },
+		body: JSON.stringify(payload)
+	})
+	.then(res => res.json())
+	.then(data => console.log('DB save result:', data))
+	.catch(err => console.error('Could not sync typing log:', err))
 }
 
 // full reset

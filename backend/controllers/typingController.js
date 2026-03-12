@@ -1,11 +1,11 @@
-import TypingResult from "../models/TypingResult.js";
+import TypingLog from "../models/TypingLog.js";
 import getLocationFromIP from "../utils/getLocationFromIP.js";
 
-const saveTypingResult = async (req, res) => {
-    const { input, wpm, accuracy, time } = req.body;
+const saveTypingLog = async (req, res) => {
+    const { wpm, spm, accuracy, time } = req.body;
 
-    if (wpm === undefined || accuracy === undefined || time === undefined) {
-        return res.status(400).json({ success: false, message: "WPM, accuracy, and time are required" });
+    if (wpm === undefined || wpm === null) {
+        return res.status(400).json({ success: false, message: "WPM is required" });
     }
 
     try {
@@ -13,33 +13,39 @@ const saveTypingResult = async (req, res) => {
         try {
             const locationData = await getLocationFromIP(req);
             if (typeof locationData === 'object' && locationData !== null) {
-                locationString = `${locationData.city}, ${locationData.region}, ${locationData.country}`;
+                locationString = `${locationData.city}, ${locationData.country}`;
             } else if (typeof locationData === 'string') {
                 locationString = locationData;
             }
-        } catch (locErr) { }
+        } catch (locErr) { 
+            // fallback gracefully
+        }
 
-        const resultRecord = new TypingResult({
+        const logRecord = new TypingLog({
             location: locationString,
-            input: input || "",
-            result: { wpm, accuracy, time }
+            wpm: wpm || 0,
+            spm: spm || 0,
+            accuracy: accuracy || 0,
+            time: time || 0
         });
-        await resultRecord.save();
-        return res.status(201).json({ success: true, result: resultRecord });
+        await logRecord.save();
+        
+        console.log(`TypingLog saved: ${locationString} | WPM: ${wpm} | SPM: ${spm} | Accuracy: ${accuracy}% | Time: ${time}s`);
+        return res.status(201).json({ success: true, result: logRecord });
     } catch (error) {
-        console.error("Error saving typing result:", error);
+        console.error("Error saving typing log:", error);
         return res.status(500).json({ success: false, message: "Server Error" });
     }
 };
 
-const getTypingResults = async (req, res) => {
+const getTypingLogs = async (req, res) => {
     try {
-        const results = await TypingResult.find().sort({ createdAt: -1 }).limit(10);
+        const results = await TypingLog.find().sort({ createdAt: -1 }).limit(10);
         return res.status(200).json({ success: true, results });
     } catch (error) {
-        console.error("Error fetching typing results:", error);
+        console.error("Error fetching typing logs:", error);
         return res.status(500).json({ success: false, message: "Server Error" });
     }
 };
 
-export { saveTypingResult, getTypingResults };
+export { saveTypingLog, getTypingLogs };

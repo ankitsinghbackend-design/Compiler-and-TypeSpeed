@@ -8,7 +8,7 @@ export const loadTheme = (resource: string) => {
 	console.log('Loading Theme:', resource)
 
 	let link = document.createElement('link')
-	link.href = '/themes/' + resource + '.css'
+	link.href = '/typer/themes/' + resource + '.css'
 	link.type = 'text/css'
 	link.rel = 'stylesheet'
 	link.media = 'screen,print'
@@ -17,5 +17,5 @@ export const loadTheme = (resource: string) => {
 }
 
 export const getThemeList = async (): Promise<themeList> => {
-	return (await fetch('/themes/_list.json')).json()
+	return (await fetch('/typer/themes/_list.json')).json()
 }

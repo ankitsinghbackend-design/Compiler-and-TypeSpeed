@@ -6,6 +6,7 @@ import { presetScrollbar } from "unocss-preset-scrollbar"
 import extractorSvelte from "@unocss/extractor-svelte"
 
 export default defineConfig({
+	base: '/typer/',
 	plugins: [svelte(), Unocss({
 		extractors: [extractorSvelte()],
 		presets: [presetUno(), presetIcons(), presetScrollbar()]

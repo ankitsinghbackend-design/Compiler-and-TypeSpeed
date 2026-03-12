@@ -1,9 +1,12 @@
 import express from "express";
-import { saveTypingResult, getTypingResults } from "../controllers/typingController.js";
+import { saveTypingLog, getTypingLogs } from "../controllers/typingController.js";
 
 const router = express.Router();
 
-router.post("/result", saveTypingResult);
-router.get("/results", getTypingResults);
+// POST /api/typing/log
+router.post("/log", saveTypingLog);
+
+// GET /api/typing/logs
+router.get("/logs", getTypingLogs);
 
 export default router;

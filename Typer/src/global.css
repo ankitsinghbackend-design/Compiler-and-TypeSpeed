@@ -8,6 +8,16 @@ body {
 	box-sizing: border-box;
 }
 
+/* Beige fallback — overridden by the loaded theme CSS */
+:root {
+	--bg-color: #f5f0e8;
+	--main-color: #3a2e2a;
+	--caret-color: #b05e3a;
+	--sub-color: #a0897e;
+	--text-color: #3a2e2a;
+	--error-color: #c0392b;
+}
+
 .main {
 	z-index: 1;
 	background-color: var(--bg-color);
