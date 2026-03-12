@@ -49,11 +49,7 @@ const executeCode = async (language, code, input = "") => {
     const data = response.data;
 
     if (data.status === "error" || data.exit_code !== 0) {
-      if (data.error) {
-        throw new Error(data.error);
-      } else {
-        throw new Error(`Execution failed with exit code ${data.exit_code}`);
-      }
+      return data.error || `Execution failed with exit code ${data.exit_code}`;
     }
 
     return data.output || "Program executed successfully with no output";

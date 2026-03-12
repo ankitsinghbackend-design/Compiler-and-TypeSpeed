@@ -105,13 +105,26 @@ const Compiler = () => {
         <div className="flex flex-col h-screen md:flex-row bg-[#1e1e1e]">
             {/* Editor Section */}
             <div className="flex flex-col flex-1 p-4 border-b border-gray-700 md:border-b-0 md:border-r">
+                <style>{`
+                  /* Thin scrollbar helper */
+                  .scrollbar-thin::-webkit-scrollbar {
+                      width: 6px;
+                  }
+                  .scrollbar-thin::-webkit-scrollbar-track {
+                      background: #1f2937;
+                  }
+                  .scrollbar-thin::-webkit-scrollbar-thumb {
+                      background-color: #4b5563;
+                      border-radius: 20px;
+                  }
+                `}</style>
                 <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center space-x-2">
                         <Code2 className="text-blue-500" />
                         <h1 className="text-xl font-bold text-white hidden sm:block">Code Editor</h1>
                     </div>
                     
-                    <div className="flex space-x-3 items-center">
+                    <div className="flex space-x-3 items-center ml-auto">
                         {/* Custom Dropdown */}
                         <div className="relative" ref={dropdownRef}>
                             <button
