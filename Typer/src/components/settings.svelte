@@ -45,8 +45,8 @@
 {#if $settings.opened}
 	<div
 		transition:fly={{ duration: 400, x: -100 }}
-		style="direction: rtl;"
-		class="fixed h-full z-2 overflow-x-hidden overflow-y-scroll scrollbar scrollbar-rounded scrollbar-track-color-transparent scrollbar-thumb-color-current w-128"
+		style="direction: rtl; background-color: var(--bg-color, #f5f0e8);"
+		class="fixed h-full z-2 overflow-x-hidden overflow-y-scroll scrollbar scrollbar-rounded scrollbar-track-color-transparent scrollbar-thumb-color-current w-128 max-w-full"
 	>
 		<div class="pl-5 py-5 inline" style="direction: ltr;">
 			<div class="grid grid-cols-4 auto-rows-auto gap-3 p-3">

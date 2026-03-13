@@ -2,10 +2,14 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 
-const AdPlaceholder = ({ width = 'w-full', height = 'h-full', label = 'Advertisement' }) => (
-  <div className={`${width} ${height} flex flex-col items-center justify-center bg-gray-800/60 border border-dashed border-gray-600 rounded-lg`}>
-    <span className="text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-1">AD</span>
-    <span className="text-[9px] text-gray-600 tracking-wide">{label}</span>
+const AdPlaceholder = ({ label = 'Advertisement' }) => (
+  <div style={{
+    width: '100%', height: '100%',
+    display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+    background: 'rgba(31,41,55,0.6)', border: '1px dashed #4b5563', borderRadius: '8px'
+  }}>
+    <span style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#6b7280', marginBottom: 2 }}>AD</span>
+    <span style={{ fontSize: 9, color: '#4b5563', letterSpacing: '0.05em' }}>{label}</span>
   </div>
 );
 
@@ -13,58 +17,192 @@ const TypeSpeed = () => {
     const navigate = useNavigate();
 
     return (
-        <div className="flex flex-col h-screen bg-[#121212] font-sans">
+        <div className="ts-page">
+            <style>{`
+                .ts-page {
+                    display: flex;
+                    flex-direction: column;
+                    height: 100vh;
+                    background: #121212;
+                    font-family: system-ui, -apple-system, sans-serif;
+                }
+
+                .ts-header {
+                    display: grid;
+                    grid-template-columns: 1fr auto 1fr;
+                    align-items: center;
+                    padding: 12px 16px;
+                    border-bottom: 1px solid #1f2937;
+                    background: #1e1e1e;
+                    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+                    z-index: 20;
+                }
+
+                .ts-back-btn {
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    color: #9ca3af;
+                    background: none;
+                    border: none;
+                    padding: 6px 12px;
+                    border-radius: 6px;
+                    cursor: pointer;
+                    font-size: 13px;
+                    font-weight: 600;
+                    letter-spacing: 0.05em;
+                    transition: all 200ms;
+                }
+                .ts-back-btn:hover { color: white; background: #374151; }
+
+                .ts-header-ad {
+                    width: 468px;
+                    height: 60px;
+                }
+
+                .ts-main {
+                    display: flex;
+                    flex: 1;
+                    overflow: hidden;
+                }
+
+                .ts-side-ad {
+                    display: flex;
+                    width: 144px;
+                    padding: 8px;
+                }
+
+                .ts-iframe-wrap {
+                    flex: 1;
+                    position: relative;
+                    overflow: hidden;
+                }
+
+                .ts-iframe-wrap iframe {
+                    width: 100%;
+                    height: 100%;
+                    border: none;
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    background: #f5f0e8;
+                }
+
+                .ts-bottom-ad {
+                    width: 100%;
+                    height: 80px;
+                    padding: 8px 16px;
+                    background: #1a1a1a;
+                    border-top: 1px solid #1f2937;
+                }
+
+                /* ==================== MOBILE / ANDROID RESPONSIVE ==================== */
+                @media (max-width: 768px) {
+                    .ts-header {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        padding: 10px 12px;
+                    }
+
+                    .ts-header-ad {
+                        display: none;
+                    }
+
+                    .ts-header-spacer {
+                        display: none;
+                    }
+
+                    .ts-side-ad {
+                        display: none;
+                    }
+
+                    .ts-bottom-ad {
+                        height: 60px;
+                        padding: 6px 10px;
+                    }
+
+                    .ts-back-btn span {
+                        display: none;
+                    }
+
+                    .ts-mobile-ad {
+                        display: flex;
+                        justify-content: center;
+                        padding: 6px 0;
+                    }
+                }
+
+                @media (max-width: 480px) {
+                    .ts-header {
+                        padding: 8px 10px;
+                    }
+
+                    .ts-bottom-ad {
+                        height: 50px;
+                        padding: 4px 8px;
+                    }
+                }
+
+                /* Mobile ad slots — hidden on desktop */
+                .ts-mobile-ad {
+                    display: none;
+                }
+            `}</style>
+
             {/* Header / Navbar */}
-            <div className="grid grid-cols-3 items-center p-4 border-b border-gray-800 bg-[#1e1e1e] shadow-md z-10">
+            <div className="ts-header">
                 {/* Left — Back button */}
-                <div className="flex items-center">
-                    <button
-                        onClick={() => navigate('/')}
-                        className="flex items-center space-x-2 text-gray-400 hover:text-white transition-colors px-3 py-1.5 rounded-md hover:bg-gray-800"
-                    >
+                <div>
+                    <button onClick={() => navigate('/')} className="ts-back-btn">
                         <ArrowLeft size={18} />
-                        <span className="text-sm font-semibold tracking-wide">BACK TO MENU</span>
+                        <span>BACK TO MENU</span>
                     </button>
                 </div>
 
-                {/* Centre — Horizontal Ad */}
-                <div className="flex justify-center">
-                    <div className="w-[468px] h-16">
-                        <AdPlaceholder label="468×60 Banner" />
-                    </div>
+                {/* Centre — Horizontal Ad (hidden on mobile) */}
+                <div className="ts-header-ad">
+                    <AdPlaceholder label="468×60 Banner" />
                 </div>
 
-                {/* Right — intentionally empty, balances the grid */}
-                <div />
+                {/* Right — balancer (hidden on mobile) */}
+                <div className="ts-header-spacer" />
             </div>
 
-            {/* Main area: left ad rail + typer + right ad rail */}
-            <div className="flex flex-1 overflow-hidden">
+            {/* Mobile-only: top banner ad */}
+            <div className="ts-mobile-ad">
+                <AdPlaceholder label="320×50 Mobile Banner" />
+            </div>
 
-                {/* Left Skyscraper Ad */}
-                <div className="hidden lg:flex w-36 p-2">
-                    <AdPlaceholder width="w-full" height="h-full" label="160×600 Skyscraper" />
+            {/* Main area */}
+            <div className="ts-main">
+                {/* Left Skyscraper (hidden on mobile) */}
+                <div className="ts-side-ad">
+                    <AdPlaceholder label="160×600 Skyscraper" />
                 </div>
 
                 {/* Typer iframe */}
-                <div className="flex-1 relative overflow-hidden">
+                <div className="ts-iframe-wrap">
                     <iframe
                         src="/typer/index.html"
                         title="TypeSpeed Tracker"
-                        className="w-full h-full border-0 absolute top-0 left-0"
-                        style={{ backgroundColor: '#f5f0e8' }}
                     />
                 </div>
 
-                {/* Right Skyscraper Ad */}
-                <div className="hidden lg:flex w-36 p-2">
-                    <AdPlaceholder width="w-full" height="h-full" label="160×600 Skyscraper" />
+                {/* Right Skyscraper (hidden on mobile) */}
+                <div className="ts-side-ad">
+                    <AdPlaceholder label="160×600 Skyscraper" />
                 </div>
             </div>
 
-            {/* Bottom Banner Ad */}
-            <div className="w-full h-24 px-4 py-2 bg-[#1a1a1a] border-t border-gray-800">
-                <AdPlaceholder height="h-full" label="728×90 Leaderboard" />
+            {/* Bottom Banner Ad — desktop */}
+            <div className="ts-bottom-ad">
+                <AdPlaceholder label="728×90 Leaderboard" />
+            </div>
+
+            {/* Bottom — mobile-only smaller banner */}
+            <div className="ts-mobile-ad">
+                <AdPlaceholder label="320×50 Mobile Banner" />
             </div>
         </div>
     );

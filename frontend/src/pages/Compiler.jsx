@@ -37,12 +37,15 @@ const defaultCode = {
     haskell: 'main :: IO ()\nmain = putStrLn "Hello, World!"'
 };
 
-
-// Reusable ad placeholder
-const AdPlaceholder = ({ height = 'h-20', label = 'Advertisement' }) => (
-    <div className={`w-full ${height} flex flex-col items-center justify-center bg-gray-800/50 border border-dashed border-gray-600 rounded-lg`}>
-        <span className="text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-0.5">AD</span>
-        <span className="text-[9px] text-gray-600 tracking-wide">{label}</span>
+// Ad slot wrapper with unique id for AdSense
+const AdSlot = ({ id, style = {}, label = 'AD', className = '' }) => (
+    <div id={id} className={className} style={{
+        display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+        background: 'rgba(31,41,55,0.5)', border: '1px dashed #4b5563', borderRadius: '8px',
+        ...style
+    }}>
+        <span style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#6b7280', marginBottom: 2 }}>AD</span>
+        <span style={{ fontSize: 9, color: '#4b5563', letterSpacing: '0.05em' }}>{label}</span>
     </div>
 );
 
@@ -113,26 +116,197 @@ const Compiler = () => {
     };
 
     return (
-        <div className="flex flex-col h-screen md:flex-row bg-[#1e1e1e]">
+        <div className="compiler-page">
+            <style>{`
+                .compiler-page {
+                    display: flex;
+                    flex-direction: row;
+                    height: 100vh;
+                    background: #1e1e1e;
+                }
+
+                .scrollbar-thin::-webkit-scrollbar { width: 6px; }
+                .scrollbar-thin::-webkit-scrollbar-track { background: #1f2937; }
+                .scrollbar-thin::-webkit-scrollbar-thumb { background-color: #4b5563; border-radius: 20px; }
+
+                .editor-section {
+                    display: flex;
+                    flex-direction: column;
+                    flex: 1;
+                    padding: 16px;
+                    border-right: 1px solid #374151;
+                    min-width: 0;
+                }
+
+                .toolbar {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    margin-bottom: 12px;
+                    gap: 8px;
+                }
+
+                .toolbar-controls {
+                    display: flex;
+                    align-items: center;
+                    gap: 12px;
+                    margin-left: auto;
+                }
+
+                .lang-dropdown-btn {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    width: 192px;
+                    padding: 8px 12px;
+                    font-size: 14px;
+                    color: white;
+                    background: #1f2937;
+                    border: 1px solid #4b5563;
+                    border-radius: 6px;
+                    cursor: pointer;
+                    transition: background 200ms;
+                }
+                .lang-dropdown-btn:hover { background: #374151; }
+
+                .run-btn {
+                    padding: 8px 20px;
+                    font-size: 14px;
+                    font-weight: 600;
+                    letter-spacing: 0.025em;
+                    color: white;
+                    background: #2563eb;
+                    border: none;
+                    border-radius: 6px;
+                    cursor: pointer;
+                    transition: background 200ms, transform 100ms;
+                    white-space: nowrap;
+                }
+                .run-btn:hover { background: #3b82f6; }
+                .run-btn:active { transform: scale(0.95); }
+                .run-btn:disabled { background: rgba(59,130,246,0.5); cursor: not-allowed; }
+
+                .editor-container {
+                    flex: 1;
+                    overflow: hidden;
+                    border: 1px solid #374151;
+                    border-radius: 6px;
+                    background: #1e1e1e;
+                }
+
+                .io-section {
+                    display: flex;
+                    flex-direction: column;
+                    width: 33.333%;
+                    padding: 16px;
+                    min-height: 300px;
+                }
+
+                .io-section textarea {
+                    flex: 1;
+                    padding: 12px;
+                    font-size: 14px;
+                    font-family: monospace;
+                    color: #e5e7eb;
+                    background: #0d0d0d;
+                    border: 1px solid #374151;
+                    border-radius: 6px;
+                    resize: none;
+                    outline: none;
+                    transition: border-color 200ms;
+                }
+                .io-section textarea:focus { border-color: #3b82f6; }
+
+                .io-output {
+                    flex: 1;
+                    padding: 12px;
+                    overflow-y: auto;
+                    font-size: 14px;
+                    font-family: monospace;
+                    color: #e5e7eb;
+                    background: #0d0d0d;
+                    border: 1px solid #374151;
+                    border-radius: 6px;
+                    white-space: pre-wrap;
+                }
+
+                /* ==================== MOBILE / ANDROID RESPONSIVE ==================== */
+                @media (max-width: 768px) {
+                    .compiler-page {
+                        flex-direction: column;
+                        height: auto;
+                        min-height: 100vh;
+                    }
+
+                    .editor-section {
+                        border-right: none;
+                        border-bottom: 1px solid #374151;
+                        padding: 10px;
+                        min-height: 50vh;
+                    }
+
+                    .toolbar {
+                        flex-wrap: wrap;
+                        gap: 8px;
+                    }
+
+                    .toolbar-controls {
+                        width: 100%;
+                        justify-content: space-between;
+                        margin-left: 0;
+                    }
+
+                    .lang-dropdown-btn {
+                        flex: 1;
+                        min-width: 0;
+                        width: auto;
+                    }
+
+                    .run-btn {
+                        padding: 10px 16px;
+                        flex-shrink: 0;
+                    }
+
+                    .io-section {
+                        width: 100%;
+                        min-height: auto;
+                        padding: 10px;
+                    }
+
+                    .ad-desktop { display: none; }
+                    .ad-mobile {
+                        display: flex;
+                        width: 100%;
+                        justify-content: center;
+                        padding: 8px 0;
+                    }
+                }
+
+                @media (max-width: 480px) {
+                    .toolbar-controls {
+                        flex-direction: column;
+                        gap: 8px;
+                    }
+
+                    .lang-dropdown-btn {
+                        width: 100%;
+                    }
+
+                    .run-btn {
+                        width: 100%;
+                        text-align: center;
+                        padding: 12px;
+                        font-size: 16px;
+                    }
+                }
+            `}</style>
+
             {/* Editor Section */}
-            <div className="flex flex-col flex-1 p-4 border-b border-gray-700 md:border-b-0 md:border-r">
-                <style>{`
-                  /* Thin scrollbar helper */
-                  .scrollbar-thin::-webkit-scrollbar {
-                      width: 6px;
-                  }
-                  .scrollbar-thin::-webkit-scrollbar-track {
-                      background: #1f2937;
-                  }
-                  .scrollbar-thin::-webkit-scrollbar-thumb {
-                      background-color: #4b5563;
-                      border-radius: 20px;
-                  }
-                `}</style>
-                <div className="flex items-center justify-between mb-4">
-                    <button 
+            <div className="editor-section">
+                <div className="toolbar">
+                    <button
                         onClick={() => navigate('/')}
-                        className="flex items-center space-x-2 text-gray-400 hover:text-white transition-colors px-2 py-1 mr-4"
+                        className="flex items-center space-x-2 text-gray-400 hover:text-white transition-colors px-2 py-1"
                     >
                         <ArrowLeft size={20} />
                         <span className="text-sm font-semibold tracking-wide">BACK</span>
@@ -141,13 +315,13 @@ const Compiler = () => {
                         <Code2 className="text-blue-500" />
                         <h1 className="text-xl font-bold text-white hidden sm:block">Code Editor</h1>
                     </div>
-                    
-                    <div className="flex space-x-3 items-center ml-auto">
-                        {/* Custom Dropdown */}
+
+                    <div className="toolbar-controls">
+                        {/* Language Dropdown */}
                         <div className="relative" ref={dropdownRef}>
                             <button
                                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                                className="flex items-center justify-between w-48 px-3 py-2 text-sm text-white bg-gray-800 border border-gray-600 rounded-md focus:outline-none hover:bg-gray-700 transition"
+                                className="lang-dropdown-btn"
                             >
                                 <div className="flex items-center space-x-2">
                                     {selectedOption.icon}
@@ -176,21 +350,18 @@ const Compiler = () => {
                             )}
                         </div>
 
+                        {/* Run Code Button */}
                         <button
                             onClick={handleRunCode}
                             disabled={isCompiling}
-                            className={`px-5 py-2 text-sm font-semibold tracking-wide text-white transition rounded-md shadow-sm ${
-                                isCompiling
-                                    ? 'bg-blue-500/50 cursor-not-allowed'
-                                    : 'bg-blue-600 hover:bg-blue-500 active:scale-95'
-                            }`}
+                            className="run-btn"
                         >
-                            {isCompiling ? 'Running...' : 'Run Code'}
+                            {isCompiling ? 'Running...' : '▶ Run Code'}
                         </button>
                     </div>
                 </div>
 
-                <div className="flex-1 overflow-hidden border border-gray-700 rounded-md bg-[#1e1e1e]">
+                <div className="editor-container">
                     <Editor
                         height="100%"
                         language={getMonacoLanguage(language)}
@@ -205,36 +376,43 @@ const Compiler = () => {
                         }}
                     />
                 </div>
-                {/* Ad strip below the editor */}
-                <div className="mt-3">
-                    <AdPlaceholder height="h-12" label="728×90 Leaderboard" />
+                {/* Desktop ad below editor */}
+                <div className="mt-3 ad-desktop">
+                    <AdSlot id="compiler-below-editor" style={{ width: '100%', height: 48 }} label="728×90 Leaderboard" />
+                </div>
+                {/* Mobile ad below editor */}
+                <div className="ad-mobile" style={{ display: 'none' }}>
+                    <AdSlot id="compiler-mobile-mid" style={{ width: 320, height: 50 }} label="320×50 Mobile Banner" />
                 </div>
             </div>
 
             {/* Input / Output Section */}
-            <div className="flex flex-col w-full p-4 md:w-1/3 min-h-[300px]">
+            <div className="io-section">
                 {/* Standard Input */}
-                <div className="flex flex-col flex-1 mb-4 h-1/2">
+                <div className="flex flex-col flex-1 mb-4">
                     <h2 className="mb-2 text-sm font-semibold text-gray-400 uppercase tracking-wider">Input (stdin)</h2>
                     <textarea
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
-                        className="flex-1 p-3 text-sm text-gray-200 bg-[#0d0d0d] border border-gray-700 rounded-md resize-none focus:outline-none focus:border-blue-500 transition font-mono shadow-inner"
                         placeholder="Enter standard input here..."
                     />
                 </div>
 
                 {/* Standard Output */}
-                <div className="flex flex-col flex-1 h-1/2">
+                <div className="flex flex-col flex-1">
                     <h2 className="mb-2 text-sm font-semibold text-gray-400 uppercase tracking-wider">Output</h2>
-                    <div className="flex-1 p-3 overflow-y-auto text-sm text-gray-200 bg-[#0d0d0d] border border-gray-700 rounded-md whitespace-pre-wrap font-mono relative shadow-inner">
+                    <div className="io-output">
                         {output ? output : <span className="text-gray-600 select-none">Output will appear here...</span>}
                     </div>
                 </div>
 
-                {/* Ad below output panel */}
-                <div className="mt-3">
-                    <AdPlaceholder height="h-20" label="300×250 Rectangle" />
+                {/* Desktop ad below output */}
+                <div className="mt-3 ad-desktop">
+                    <AdSlot id="compiler-below-output" style={{ width: '100%', height: 80 }} label="300×250 Rectangle" />
+                </div>
+                {/* Mobile ad below output */}
+                <div className="ad-mobile" style={{ display: 'none' }}>
+                    <AdSlot id="compiler-mobile-bottom" style={{ width: 320, height: 100 }} label="320×100 Large Mobile Banner" />
                 </div>
             </div>
         </div>
@@ -242,4 +420,3 @@ const Compiler = () => {
 };
 
 export default Compiler;
-
