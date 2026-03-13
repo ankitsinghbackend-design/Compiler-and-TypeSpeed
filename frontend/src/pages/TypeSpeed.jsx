@@ -125,12 +125,6 @@ const TypeSpeed = () => {
                     .ts-back-btn span {
                         display: none;
                     }
-
-                    .ts-mobile-ad {
-                        display: flex;
-                        justify-content: center;
-                        padding: 6px 0;
-                    }
                 }
 
                 @media (max-width: 480px) {
@@ -142,11 +136,6 @@ const TypeSpeed = () => {
                         height: 50px;
                         padding: 4px 8px;
                     }
-                }
-
-                /* Mobile ad slots — hidden on desktop */
-                .ts-mobile-ad {
-                    display: none;
                 }
             `}</style>
 
@@ -167,11 +156,6 @@ const TypeSpeed = () => {
 
                 {/* Right — balancer (hidden on mobile) */}
                 <div className="ts-header-spacer" />
-            </div>
-
-            {/* Mobile-only: top banner ad */}
-            <div className="ts-mobile-ad">
-                <AdPlaceholder label="320×50 Mobile Banner" />
             </div>
 
             {/* Main area */}
@@ -195,14 +179,9 @@ const TypeSpeed = () => {
                 </div>
             </div>
 
-            {/* Bottom Banner Ad — desktop */}
+            {/* Bottom Banner Ad */}
             <div className="ts-bottom-ad">
                 <AdPlaceholder label="728×90 Leaderboard" />
-            </div>
-
-            {/* Bottom — mobile-only smaller banner */}
-            <div className="ts-mobile-ad">
-                <AdPlaceholder label="320×50 Mobile Banner" />
             </div>
         </div>
     );

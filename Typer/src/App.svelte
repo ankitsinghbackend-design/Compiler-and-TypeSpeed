@@ -12,7 +12,10 @@
 	import Results from "./components/results.svelte";
 	import Downfall from "./components/downfall.svelte";
 
+	let isMobile = false;
+
 	const mouseMoved = (e: MouseEvent) => {
+		if (isMobile) return; // disable hover on touch devices
 		const s = get(settings);
 		if (e.clientX < remToPx(32)) {
 			s.opened = true;
@@ -28,9 +31,33 @@
 		settings.set(s);
 	};
 
+	const handleTouch = (e: TouchEvent) => {
+		const s = get(settings);
+		const touch = e.touches[0];
+		if (!touch) return;
+
+		// If settings is open and user taps to the right of the panel, close it
+		if (s.opened && touch.clientX > Math.min(remToPx(32), window.innerWidth * 0.85)) {
+			s.opened = false;
+			settings.set(s);
+		} else if (s.cosmetics.theme.opened && touch.clientX < window.innerWidth - remToPx(24)) {
+			s.cosmetics.theme.opened = false;
+			settings.set(s);
+		}
+	};
+
+	const toggleSettings = () => {
+		settings.update(s => {
+			s.opened = !s.opened;
+			if (s.opened) s.cosmetics.theme.opened = false;
+			return s;
+		});
+	};
+
 	refreshCosmetics();
 
 	onMount(() => {
+		isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 		checkCacheAgeAndRenew();
 	});
 </script>

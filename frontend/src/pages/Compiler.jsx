@@ -37,15 +37,11 @@ const defaultCode = {
     haskell: 'main :: IO ()\nmain = putStrLn "Hello, World!"'
 };
 
-// Ad slot wrapper with unique id for AdSense
-const AdSlot = ({ id, style = {}, label = 'AD', className = '' }) => (
-    <div id={id} className={className} style={{
-        display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-        background: 'rgba(31,41,55,0.5)', border: '1px dashed #4b5563', borderRadius: '8px',
-        ...style
-    }}>
-        <span style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#6b7280', marginBottom: 2 }}>AD</span>
-        <span style={{ fontSize: 9, color: '#4b5563', letterSpacing: '0.05em' }}>{label}</span>
+// Reusable ad placeholder
+const AdPlaceholder = ({ height = 'h-20', label = 'Advertisement' }) => (
+    <div className={`w-full ${height} flex flex-col items-center justify-center bg-gray-800/50 border border-dashed border-gray-600 rounded-lg`}>
+        <span className="text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-0.5">AD</span>
+        <span className="text-[9px] text-gray-600 tracking-wide">{label}</span>
     </div>
 );
 
@@ -234,15 +230,16 @@ const Compiler = () => {
                 @media (max-width: 768px) {
                     .compiler-page {
                         flex-direction: column;
-                        height: auto;
-                        min-height: 100vh;
+                        height: 100vh;
+                        overflow: hidden;
                     }
 
                     .editor-section {
                         border-right: none;
                         border-bottom: 1px solid #374151;
                         padding: 10px;
-                        min-height: 50vh;
+                        height: 50vh;
+                        flex: none;
                     }
 
                     .toolbar {
@@ -260,26 +257,28 @@ const Compiler = () => {
                         flex: 1;
                         min-width: 0;
                         width: auto;
+                        padding: 10px 12px;
+                        font-size: 16px;
                     }
 
                     .run-btn {
-                        padding: 10px 16px;
+                        padding: 12px 16px;
                         flex-shrink: 0;
+                        font-size: 16px;
                     }
 
                     .io-section {
                         width: 100%;
-                        min-height: auto;
+                        flex: 1;
                         padding: 10px;
+                        overflow: hidden;
                     }
 
-                    .ad-desktop { display: none; }
-                    .ad-mobile {
-                        display: flex;
-                        width: 100%;
-                        justify-content: center;
-                        padding: 8px 0;
+                    .io-section textarea, .io-output {
+                        font-size: 16px;
                     }
+
+                    .ad-strip-mobile { display: none; }
                 }
 
                 @media (max-width: 480px) {
@@ -370,19 +369,15 @@ const Compiler = () => {
                         onChange={(value) => setCode(value || '')}
                         options={{
                             minimap: { enabled: false },
-                            fontSize: 14,
+                            fontSize: window.innerWidth < 768 ? 16 : 14,
                             wordWrap: 'on',
                             padding: { top: 16 }
                         }}
                     />
                 </div>
-                {/* Desktop ad below editor */}
-                <div className="mt-3 ad-desktop">
-                    <AdSlot id="compiler-below-editor" style={{ width: '100%', height: 48 }} label="728×90 Leaderboard" />
-                </div>
-                {/* Mobile ad below editor */}
-                <div className="ad-mobile" style={{ display: 'none' }}>
-                    <AdSlot id="compiler-mobile-mid" style={{ width: 320, height: 50 }} label="320×50 Mobile Banner" />
+                {/* Ad strip below editor — hidden on mobile */}
+                <div className="mt-3 ad-strip-mobile">
+                    <AdPlaceholder height="h-12" label="728×90 Leaderboard" />
                 </div>
             </div>
 
@@ -406,13 +401,9 @@ const Compiler = () => {
                     </div>
                 </div>
 
-                {/* Desktop ad below output */}
-                <div className="mt-3 ad-desktop">
-                    <AdSlot id="compiler-below-output" style={{ width: '100%', height: 80 }} label="300×250 Rectangle" />
-                </div>
-                {/* Mobile ad below output */}
-                <div className="ad-mobile" style={{ display: 'none' }}>
-                    <AdSlot id="compiler-mobile-bottom" style={{ width: 320, height: 100 }} label="320×100 Large Mobile Banner" />
+                {/* Ad below output */}
+                <div className="mt-3 ad-strip-mobile">
+                    <AdPlaceholder height="h-20" label="300×250 Rectangle" />
                 </div>
             </div>
         </div>
