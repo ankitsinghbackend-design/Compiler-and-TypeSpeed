@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://compiler-and-type-speed.vercel.app/sitemap.xml

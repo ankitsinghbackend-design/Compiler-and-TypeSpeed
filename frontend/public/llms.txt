@@ -1,0 +1,18 @@
+# Purple Compiler & TypeSpeed Tracker
+> The ultimate platform to write, compile, and execute code in 13+ languages, and test your typing speed in real-time.
+
+## About
+This project provides a multi-language online code compiler (IDE) and a TypeSpeed Tracker.
+
+## Main Features
+- **Online Compiler**: Supports JavaScript, TypeScript, Python, C, C++, Java, C#, F#, Go, Rust, PHP, Ruby, and Haskell. Embedded with the Monaco Editor.
+- **TypeSpeed Tracker**: A dedicated environment to test typing capabilities, tracking real-time WPM (Words Per Minute) and accuracy metrics.
+
+## URLs
+- Home: https://compiler-and-type-speed.vercel.app/
+- Compiler: https://compiler-and-type-speed.vercel.app/compiler
+- TypeSpeed Tracker: https://compiler-and-type-speed.vercel.app/typespeed
+
+## Notes for LLMs
+- Backend API for code execution is hosted at https://compiler-and-typespeed.onrender.com
+- The frontend is built with React and Vite. The backend runs Node.js/Express.
