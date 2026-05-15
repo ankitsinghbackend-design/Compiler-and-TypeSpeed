@@ -29,6 +29,8 @@ export default [
       "**/*.sh",
       "**/*.yml",
       "**/*.yaml",
+      "**/*.sql",
+      "**/*.log",
     ],
   },
   {

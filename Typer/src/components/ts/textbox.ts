@@ -7,6 +7,39 @@ import { randomizeSettings } from './settings'
 import { crossfade } from 'svelte/transition'
 import { initTimer, resetTimer, startTimer } from '../../lib/timer'
 
+/**
+ * Typer may run inside the LabBuddy iframe (same origin → POST /api so Vite proxies to the backend),
+ * or standalone (use VITE_API_URL). For split production hosts, the parent can set ?apiBase= on the iframe URL.
+ */
+function resolveTypingLogUrl(): string {
+	if (typeof window === 'undefined') return '/api/typing/log'
+
+	const qs = new URLSearchParams(window.location.search)
+	const injected = qs.get('apiBase')
+	if (injected) {
+		const base = decodeURIComponent(injected).replace(/\/$/, '')
+		return `${base}/api/typing/log`
+	}
+
+	const embedded = window.parent !== window
+	if (embedded) {
+		return '/api/typing/log'
+	}
+
+	const raw =
+		typeof import.meta.env.VITE_API_URL === 'string' ? import.meta.env.VITE_API_URL.trim() : ''
+	if (!raw) return '/api/typing/log'
+	return `${raw.replace(/\/$/, '')}/api/typing/log`
+}
+
+const MAX_RUN_TEXT_SNAPSHOT = 100_000
+
+function textArrayToSnapshot(arr: TextArr): string {
+	if (!arr?.length) return ''
+	const raw = arr.map((w) => w.letters.map((l) => l.letter).join('')).join(' ')
+	return raw.length > MAX_RUN_TEXT_SNAPSHOT ? raw.slice(0, MAX_RUN_TEXT_SNAPSHOT) : raw
+}
+
 // === Textbox Logic ===
 
 export const letterHighlighting = (obj: any) => {
@@ -300,21 +333,39 @@ export const endRun = () => {
 
 	const finalStats = get(runState)
 	const payload = {
-		wpm:      finalStats.aggWPM,
-		spm:      finalStats.aggSPM,
+		wpm: finalStats.aggWPM,
+		spm: finalStats.aggSPM,
 		accuracy: finalStats.accuracy,
-		time:     finalStats.timePassed
+		time: finalStats.timePassed,
+		input: textArrayToSnapshot(get(textArray)),
 	}
 	console.log('TypeSpeed run ended — saving to DB:', payload)
 
-	fetch(`${import.meta.env.VITE_API_URL}/api/typing/log`, {
+	const logUrl = resolveTypingLogUrl()
+
+	fetch(logUrl, {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
 		body: JSON.stringify(payload)
 	})
-	.then(res => res.json())
-	.then(data => console.log('DB save result:', data))
-	.catch(err => console.error('Could not sync typing log:', err))
+		.then(async (res) => {
+			const text = await res.text()
+			let data: unknown
+			try {
+				data = JSON.parse(text) as unknown
+			} catch {
+				throw new Error(`Typing log HTTP ${res.status}: ${text.slice(0, 200)}`)
+			}
+			if (!res.ok) {
+				const msg = typeof data === 'object' && data !== null && 'message' in data
+					? String((data as { message?: string }).message)
+					: `Typing log failed (${res.status})`
+				throw new Error(msg)
+			}
+			return data
+		})
+		.then((data) => console.log('DB save result:', data))
+		.catch((err) => console.error('Could not sync typing log:', err))
 }
 
 // full reset

@@ -66,7 +66,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: lint
     env:
-      MONGODB_URI: ${{ secrets.MONGODB_URI }}
+      NEON_DB_URI: ${{ secrets.NEON_DB_URI }}
       JWT_SECRET: ${{ secrets.JWT_SECRET }}
       NODE_ENV: test
     
@@ -180,5 +180,5 @@ jobs:
           cache-from: type=registry,ref=ak956901/labbuddy-backend:buildcache
           cache-to: type=registry,ref=ak956901/labbuddy-backend:buildcache,mode=max
           build-args: |
-            MONGODB_URI=${{ secrets.MONGODB_URI }}
+            NEON_DB_URI=${{ secrets.NEON_DB_URI }}
             JWT_SECRET=${{ secrets.JWT_SECRET }}

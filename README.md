@@ -28,8 +28,8 @@ The project is organized into three main components:
 | Layer | Technologies |
 | :--- | :--- |
 | **Frontend** | React 18, Vite, Tailwind CSS, Monaco Editor, Lucide |
-| **Backend** | Node.js, Express, Mongoose, Axios |
-| **Database** | MongoDB (Atlas recommended) |
+| **Backend** | Node.js, Express, pg (PostgreSQL), Axios |
+| **Database** | Neon PostgreSQL |
 | **Typing Engine** | Svelte 4, UnoCSS, TypeScript |
 | **Remote Compiler** | OnlineCompiler API (via sync endpoint) |
 
@@ -42,7 +42,7 @@ The project is organized into three main components:
 | Variable | Description | Value Example |
 | :--- | :--- | :--- |
 | `PORT` | Backend server port | `5001` |
-| `MONGO_URI` | MongoDB Connection URL | `mongodb+srv://...` |
+| `NEON_DB_URI` | Neon PostgreSQL connection URL | `postgresql://...` |
 | `COMPILER_API_KEY` | API Key for code execution | `your_token_from_onlinecompiler_io` |
 | `VITE_BASE_URL` | Frontend API endpoint | `http://localhost:5001/` |
 | `VITE_SOCKET_URL` | Socket Connection URL | `http://localhost:5001` |
@@ -56,7 +56,7 @@ The project uses a tiered build process to ensure the typing engine is correctly
 
 ### 1. Backend Deployment
 - **Runtime**: Node.js 18.x or 20.x.
-- **Database**: Ensure MongoDB connectivity.
+- **Database**: Set `NEON_DB_URI` and ensure Neon connectivity (tables are created on startup).
 - **Build Command**: `npm install && npm start` (or `pm2 start server.js`).
 
 ### 2. Frontend & Typer Build Flow

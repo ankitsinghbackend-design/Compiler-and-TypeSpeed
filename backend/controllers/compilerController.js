@@ -1,9 +1,18 @@
 import executeCode from "../utils/executeCode.js";
-import CompilerRun from "../models/CompilerRun.js";
+import { getPool } from "../db/pool.js";
 import getLocationFromIP from "../utils/getLocationFromIP.js";
 
+async function saveCompilerRun({ locationString, language, code, output }) {
+  const pool = getPool();
+  await pool.query(
+    `INSERT INTO compiler_runs (location, language, input, result)
+     VALUES ($1, $2, $3, $4)`,
+    [locationString, language, code, output],
+  );
+}
+
 const runCode = async (req, res) => {
-  const { language, code, input } = req.body; // Accept `input` from the request body
+  const { language, code, input } = req.body;
 
   if (!language || !code) {
     return res
@@ -12,26 +21,23 @@ const runCode = async (req, res) => {
   }
 
   try {
-    const output = await executeCode(language, code, input || ""); // Pass input to executeCode
+    const output = await executeCode(language, code, input || "");
 
-    // Log execution with location
     const locationData = await getLocationFromIP(req);
     let locationString = "Unknown Location";
 
-    if (typeof locationData === 'object' && locationData !== null) {
+    if (typeof locationData === "object" && locationData !== null) {
       locationString = `${locationData.city}, ${locationData.country}`;
-    } else if (typeof locationData === 'string') {
+    } else if (typeof locationData === "string") {
       locationString = locationData;
     }
 
-    // Save the run to Database
-    const compilerRun = new CompilerRun({
-      location: locationString,
+    await saveCompilerRun({
+      locationString,
       language,
-      input: code,
-      result: output
+      code,
+      output,
     });
-    await compilerRun.save();
 
     console.log(`Code executed from: ${locationString}`);
 
@@ -39,28 +45,29 @@ const runCode = async (req, res) => {
   } catch (error) {
     console.error("Error while executing code:", error);
 
-    // Log execution with location
     let locationString = "Unknown Location";
     try {
       const locationData = await getLocationFromIP(req);
-      if (typeof locationData === 'object' && locationData !== null) {
+      if (typeof locationData === "object" && locationData !== null) {
         locationString = `${locationData.city}, ${locationData.country}`;
-      } else if (typeof locationData === 'string') {
+      } else if (typeof locationData === "string") {
         locationString = locationData;
       }
-    } catch (locErr) {
+    } catch {
       // Ignore error finding location
     }
 
-    const compilerRunError = new CompilerRun({
-      location: locationString,
-      language,
-      input: code,
-      result: error?.message || "Execution error"
-    });
-    await compilerRunError.save().catch(e => console.error("Could not save error run", e));
+    try {
+      await saveCompilerRun({
+        locationString,
+        language,
+        code,
+        output: error?.message || "Execution error",
+      });
+    } catch (e) {
+      console.error("Could not save error run", e);
+    }
 
-    // Send the actual error message to the client
     return res.status(500).json({
       success: false,
       message: error?.message || error || "Error executing code",

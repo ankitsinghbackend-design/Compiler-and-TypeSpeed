@@ -1,11 +1,13 @@
-import mongoose from "mongoose";
+import { getPool } from "../db/pool.js";
+import { runMigrations } from "../db/migrate.js";
 
 const connectDB = async () => {
   try {
-    const conn = await mongoose.connect(process.env.MONGO_URI);
-    console.log(`MongoDB Connected Successfully!`);
+    getPool();
+    await runMigrations();
+    console.log("PostgreSQL (Neon) connected and schema is ready");
   } catch (error) {
-    console.error(`Error: ${error.message}`);
+    console.error(`Database error: ${error.message}`);
     process.exit(1);
   }
 };

@@ -15,14 +15,23 @@ connectDB();
 const app = express();
 const server = http.createServer(app);
 
+// Honor X-Forwarded-For / X-Real-IP from Render, nginx, or Vite dev proxy
+app.set("trust proxy", true);
+
 app.use(express.json());
 app.use(
   cors({
-    origin: [
-      /\.vercel\.app$/,          // covers all Vercel preview + production URLs
-      "http://localhost:5173",
-      "http://localhost:5174",
-    ],
+    origin(origin, callback) {
+      if (!origin) {
+        callback(null, true);
+        return;
+      }
+      const allowed =
+        /\.vercel\.app$/i.test(origin) ||
+        /^http:\/\/localhost(:\d+)?$/i.test(origin) ||
+        /^http:\/\/127\.0\.0\.1(:\d+)?$/i.test(origin);
+      callback(null, allowed ? origin : false);
+    },
     credentials: false,
   }),
 );

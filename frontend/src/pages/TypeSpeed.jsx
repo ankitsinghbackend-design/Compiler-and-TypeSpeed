@@ -16,6 +16,12 @@ const AdPlaceholder = ({ label = 'Advertisement' }) => (
 const TypeSpeed = () => {
     const navigate = useNavigate();
 
+    const apiBase = (import.meta.env.VITE_API_URL || '').trim().replace(/\/$/, '');
+    const typerSrc =
+        import.meta.env.PROD && apiBase
+            ? `/typer/index.html?apiBase=${encodeURIComponent(apiBase)}`
+            : '/typer/index.html';
+
     return (
         <div className="ts-page">
             <style>{`
@@ -168,7 +174,7 @@ const TypeSpeed = () => {
                 {/* Typer iframe */}
                 <div className="ts-iframe-wrap">
                     <iframe
-                        src="/typer/index.html"
+                        src={typerSrc}
                         title="TypeSpeed Tracker"
                     />
                 </div>

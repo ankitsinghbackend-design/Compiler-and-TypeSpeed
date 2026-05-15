@@ -19,7 +19,7 @@ labbuddy-backend/
 ├── config/           # Configuration files
 ├── controllers/      # Request handlers
 ├── middleware/       # Custom middleware functions
-├── models/          # Database models
+├── db/              # PostgreSQL schema & migrations
 ├── routes/          # API routes
 ├── utils/           # Utility functions
 └── server.js        # Main application entry
@@ -128,7 +128,7 @@ Integrated with Google's Gemini for:
 3. Set up environment variables:
    ```
    PORT=3000
-   MONGODB_URI=your_mongodb_uri
+   NEON_DB_URI=your_neon_postgresql_uri
    JWT_SECRET=your_jwt_secret
    GEMINI_API_KEY=your_gemini_api_key
    ```
@@ -142,7 +142,7 @@ Integrated with Google's Gemini for:
 Required environment variables:
 
 - `PORT` - Server port
-- `MONGODB_URI` - MongoDB connection string
+- `NEON_DB_URI` - Neon PostgreSQL connection string
 - `JWT_SECRET` - JWT signing secret
 - `GEMINI_API_KEY` - Google Gemini API key
 
@@ -151,7 +151,7 @@ Required environment variables:
 Key dependencies include:
 
 - Express.js - Web framework
-- Mongoose - MongoDB ODM
+- pg - PostgreSQL client (Neon)
 - JWT - Authentication
 - Google Gemini API - AI integration
 - Node-schedule - Task scheduling
